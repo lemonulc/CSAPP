@@ -147,7 +147,7 @@ these as you want without penalty.
 		 *   Rating: 1
 		 */
 		int bitXor(int x, int y) {
-			return 2;
+			return ~(x & y) & ~(~x & ~y);
 		}
 
 /*
@@ -158,7 +158,7 @@ these as you want without penalty.
  */
 int tmin(void) {
 
-	return 2;
+	return 1 << 31;
 
 }
 
@@ -171,7 +171,7 @@ int tmin(void) {
  *   Rating: 1
  */
 int isTmax(int x) {
-	return 2;
+	return !(x ^ ~(x + 1)) & !!(x + 1);
 }
 
 /*
@@ -183,7 +183,11 @@ int isTmax(int x) {
  *   Rating: 2
  */
 int allOddBits(int x) {
-	return 2;
+	int A = 0xA;
+	int AA = A | (A << 4);
+	int AAAA = AA | (AA << 8);
+	int mask = AAAA | (AAAA << 16);
+	return !((x & mask) ^ mask);
 }
 
 /*
@@ -194,7 +198,7 @@ int allOddBits(int x) {
  *   Rating: 2
  */
 int negate(int x) {
-	return 2;
+	return ~x + 1;
 }
 
 //3
@@ -208,7 +212,8 @@ int negate(int x) {
  *   Rating: 3
  */
 int isAsciiDigit(int x) {
-	return 2;
+	int y = x >> 6;
+	return !!(((x + (~0x30 + 1)) ^ (x + (~0x3a + 1))) >> 31) & !(x & y);
 }
 
 /*
@@ -219,7 +224,9 @@ int isAsciiDigit(int x) {
  *   Rating: 3
  */
 int conditional(int x, int y, int z) {
-	return 2;
+	x = !x;
+	int mask = ~x + 1;
+	return (~mask & y) | (mask & z);
 }
 
 /*
@@ -230,7 +237,10 @@ int conditional(int x, int y, int z) {
  *   Rating: 3
  */
 int isLessOrEqual(int x, int y) {
-	return 2;
+	int sign = (x >> 31) & 1;
+	sign = (sign << 1) + ((y >> 31) & 1);
+	int sub = x + (~y + 1);
+	return !(sign ^ 0x2) | !sub | ( (!(sign ^ 0x3) | !sign) & !!(sub >> 31));
 }
 
 //4
@@ -243,7 +253,7 @@ int isLessOrEqual(int x, int y) {
  *   Rating: 4
  */
 int logicalNeg(int x) {
-	return 2;
+	return !((~0 + 1) ^ (~x + 1));
 }
 
 /* howManyBits - return the minimum number of bits required to represent x in
@@ -259,7 +269,28 @@ int logicalNeg(int x) {
  *  Rating: 4
  */
 int howManyBits(int x) {
-	return 0;
+	int format_x = ((~(x >> 31))& x) | ((x >> 31) & (~x));
+	int mask = (~!!x) + 1;
+	int bit_16 = (!!(format_x >> 16)) << 4;
+	format_x >>= bit_16;
+
+	int bit_8 = (!!(format_x >> 8)) << 3;
+	format_x >>= bit_8;
+
+	int bit_4 = (!!(format_x >> 4)) << 2;
+	format_x >>= bit_4;
+
+	int bit_2 = (!!(format_x >> 2)) << 1;
+	format_x >>= bit_2;
+
+	int bit_1 = (!!(format_x >> 1));
+	format_x >>= bit_1;
+
+	int bit_0 = format_x;
+
+	int res = bit_16 + bit_8 + bit_4 + bit_2 + bit_1 + bit_0 + 1;
+	return (!x) | (mask & res);
+	// 0
 }
 
 //float
@@ -275,7 +306,19 @@ int howManyBits(int x) {
  *   Rating: 4
  */
 unsigned floatScale2(unsigned uf) {
-	return 2;
+	int sign = uf >> 31;
+	int exp = (uf >> 23) & 0xff;
+	int frac = uf & 0x7fffff;
+	if (exp == 0 && frac == 0)
+		return uf;
+	if (exp == 0) {
+		frac <<= 1;
+		return (sign << 31) + frac;
+	}
+	if (exp == 0xff)
+		return uf;
+	exp += 1;
+	return (sign << 31) + (exp << 23) + frac;
 }
 
 /*
@@ -291,7 +334,18 @@ unsigned floatScale2(unsigned uf) {
  *   Rating: 4
  */
 int floatFloat2Int(unsigned uf) {
-	return 2;
+	int sign = uf >> 31;
+	int exp = (uf >> 23) & 0xff;
+	int frac = uf & 0x7fffff;
+	exp -= 0x7f;
+	if (exp < 0)
+		return 0;
+	if (exp == 0xff || exp >= 31)
+		return 0x80000000u;
+	int i = sign ? -1 : 1;
+	int a = 1 << exp;
+	int b = frac >> (23 - a);
+	return i * (a + b);
 }
 
 /*
@@ -308,5 +362,9 @@ int floatFloat2Int(unsigned uf) {
  *   Rating: 4
  */
 unsigned floatPower2(int x) {
-	return 2;
+	if (x < -126)
+		return 0;
+	if (x > 127)
+		return 0x7f800000;
+	return (x + 127) << 23;
 }
