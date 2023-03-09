@@ -17,6 +17,7 @@ Cache Lab，分为两部分：
 - Part A：缓存模拟器，个人使用LRU策略进行缓存模拟
 - Part B：对矩阵转置函数进行优化，利用局部性原理，对矩阵进行分块处理
 - 主要修改 Cache Lab/cachelab-handout/ 文件夹下的 csim.c，trans.c 文件
+
 笔记地址：[Cache Lab](https://2273835878.notion.site/Cache-Lab-9dcc32219a5849249951dcf7f624bce7)
 
 
