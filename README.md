@@ -16,10 +16,12 @@ Attack Lab，就是让我们破坏程序的运行顺序，让程序执行我们�
 Cache Lab，分为两部分：
 - Part A：缓存模拟器，个人使用LRU策略进行缓存模拟
 - Part B：对矩阵转置函数进行优化，利用局部性原理，对矩阵进行分块处理
-- 主要修改 Cache Lab/cachelab-handout/ 文件夹下的 csim.c，trans.c 文件
-- 笔记地址：[Cache Lab](https://2273835878.notion.site/Cache-Lab-9dcc32219a5849249951dcf7f624bce7)  
+
+主要修改 Cache Lab/cachelab-handout/ 文件夹下的 csim.c，trans.c 文件，笔记地址：[Cache Lab](https://2273835878.notion.site/Cache-Lab-9dcc32219a5849249951dcf7f624bce7)  
 
 Malloc Lab，模拟内存分配：见笔记 [Malloc Lab](https://2273835878.notion.site/Malloc-Lab-01b40eee597e4584b18d251164972a94)
+
+Shell Lab，模拟Shell终端，主要考察线程的和信号的一些操作，修改的文件为 Shell Lab/shlab-handout/tsh.c 文件
   
 
 
