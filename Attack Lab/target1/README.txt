@@ -1,5 +1,3 @@
-Attack Lab，就是让我们破坏程序的运行顺序，让程序执行我们指定的代码。
-
 This file contains materials for one instance of the attacklab.
 
 Files:
